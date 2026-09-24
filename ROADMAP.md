@@ -18,6 +18,7 @@ Plan approved 2026-09-22. Cadence: **one 1-hour session per day**, about 6–7 w
 - **TypeScript pinned to 6.0.x** (session 1): TypeScript 7.0 is the latest, but typescript-eslint 8.x supports only `<6.1.0`. Bump once its peer range allows.
 - **Lint enforces the locator/wait policy**: `playwright/no-raw-locators`, `no-wait-for-timeout` and related rules are errors on every `.ts` file, not just specs.
 - **Saved logins are shared sessions** (session 2): WDE keeps cart, language and auth in the server-side session, so every test using `loggedInAs` for a role shares one session. Read-only tests use it. Tests that change session state (cart, `setLanguage`, logout) log in fresh. Revisit with per-worker auth if that turns out too limiting in sessions 10–11.
+- **Page objects hold locators and actions, not assertions** (session 3): tests assert with web-first `expect`. Actions that navigate to a page with deferred JS wait for `load` (`waitForURL`), and login submits wait for the POST response (`submitAndWait`). Both fixed real races found while probing. The 3 raw-locator exceptions (Quill editor, Quill bold button, rendered description) and the hidden-input order-row lookup mark markup to fix in Phase C. Locator names are English only.
 
 ## Session rules
 
@@ -46,7 +47,7 @@ Later skills, written from real experience rather than upfront:
 
 - [x] **1.** Scaffold with `npm init playwright@latest`: strict TypeScript, ESLint + Prettier, `playwright.config.ts` with `baseURL` from env, chromium/firefox/webkit projects, trace on first retry. `git init`, create the GitHub repo, commit this file.
 - [x] **2.** Typed test data, custom fixtures via `test.extend` (page objects, `setLanguage`), and an auth setup project using `storageState` so each role logs in once instead of in every test.
-- [ ] **3.** Port the 6 page objects, typed, with role/label-based locators.
+- [x] **3.** Port the 6 page objects, typed, with role/label-based locators.
 - [ ] **4.** GitHub Actions: WDE stack via docker compose, browser matrix, HTML report artifact. One smoke test green in CI.
 
 ## Phase B — Parity with the Python suite
@@ -88,3 +89,4 @@ Later skills, written from real experience rather than upfront:
 - 2026-09-23, Session 0: done. Added `CLAUDE.md` to this repo and to `wde`, plus `/session` and `ci-check` project skills. This repo has no git history yet — Session 1 starts with `git init` and the GitHub repo creation per Phase A item 1.
 - 2026-09-23, Session 1: done. Scaffolded Playwright 1.63 with strict TS 6.0 (pinned; see Decisions), ESLint 10 + typescript-eslint strict-type-checked + eslint-plugin-playwright policy rules, Prettier, `baseURL` from `WDE_BASE_URL`, 3 browser projects, trace on first retry. Repo: github.com/Gabriel-Leao51/wde-playwright-ts. There are no tests or CI workflow yet; both arrive in sessions 2–4.
 - 2026-09-24, Session 2: done. `test-data/` (JSON copied from the Python suite, typed via `satisfies`), `fixtures/` (`test.extend` with `loginPage`, `setLanguage`, and a `loggedInAs` option that swaps `storageState`), and a `setup` project that logs admin and customer in once. 11/11 green locally on all 3 browsers. Only `LoginPage`'s login flow is ported so far; session 3 ports the full 6 page objects and adds them as fixtures. There's no CI yet (session 4).
+- 2026-09-24, Session 3: done. Ported cart, login, OTP login, orders, products and Stripe checkout page objects as fixtures, with role/label locators (checked against the live stack and Stripe on all 3 browsers by a throwaway probe, not committed). Found and fixed two races (see Decisions). Open for session 10: Stripe's fields sometimes stay non-editable on Firefox when several checkouts run in parallel; serially 4/4 pass.

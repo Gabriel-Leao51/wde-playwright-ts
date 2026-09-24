@@ -1,3 +1,5 @@
+import path from 'node:path';
+
 import ordersJson from './orders.json';
 import usersJson from './users.json';
 
@@ -18,3 +20,8 @@ export type Language = 'en' | 'pt';
 export const users = usersJson satisfies Record<Role | 'invalidAdmin', Credentials>;
 
 export const orders = ordersJson satisfies { orderData: { testOrderId: string } };
+
+/** Absolute path of a file (e.g. a product image) in `test-data/`. */
+export function testDataFile(fileName: string): string {
+  return path.join(__dirname, fileName);
+}
