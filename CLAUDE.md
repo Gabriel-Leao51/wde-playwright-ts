@@ -29,7 +29,11 @@ TypeScript is pinned to `~6.0` because typescript-eslint doesn't support 7.x yet
 
 ## Test credentials
 
-Never paste credential values into code, commits, or chat — reference the fixture file instead. In the Python suite they live in `test_data/users.json`; the TypeScript port will land in an equivalent typed fixture (update this pointer once it exists).
+Never paste credential values into code, commits, or chat — reference the fixture file instead. They live in `test-data/users.json`, typed and exported as `users` from `test-data/index.ts`.
+
+## Fixtures and auth
+
+Import `test`/`expect` from `fixtures/`, not `@playwright/test`. The `setup` project (`tests/auth.setup.ts`) logs each role in once and saves `playwright/.auth/<role>.json`; a test opts in with `test.use({ loggedInAs: 'admin' })`. That session is shared server-side, so tests that mutate it (cart, language, logout) must log in fresh via `loginPage` instead.
 
 ## Locator and wait policy
 
