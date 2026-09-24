@@ -1,0 +1,77 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        project: [chromium, firefox, webkit]
+    steps:
+      - name: Checkout test suite
+        uses: actions/checkout@v4
+
+      - name: Checkout WDE app
+        uses: actions/checkout@v4
+        with:
+          repository: Gabriel-Leao51/wde
+          path: ../wde
+
+      # STRIPE_KEY only needs to be well-formed: this workflow's smoke test
+      # doesn't exercise checkout, so a placeholder test key is enough to let
+      # the app boot (the Stripe suite arrives in session 10).
+      - name: Configure WDE app env
+        working-directory: ../wde
+        run: |
+          cp .env.example .env
+          sed -i 's/^STRIPE_KEY=.*/STRIPE_KEY=sk_test_ci_placeholder/' .env
+
+      - name: Start WDE stack
+        working-directory: ../wde
+        run: docker compose up --build -d
+
+      - name: Wait for WDE app to accept connections
+        run: |
+          for i in $(seq 1 60); do
+            if curl -sf http://localhost:3000 -o /dev/null; then
+              echo "WDE app is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "WDE app did not become ready in time" >&2
+          exit 1
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps
+
+      - name: Run tests
+        run: npx playwright test --project=${{ matrix.project }}
+
+      - name: Upload HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ matrix.project }}
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Dump WDE app logs on failure
+        if: failure()
+        working-directory: ../wde
+        run: docker compose logs
