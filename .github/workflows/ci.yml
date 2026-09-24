@@ -17,23 +17,26 @@ jobs:
       - name: Checkout test suite
         uses: actions/checkout@v4
 
+      # actions/checkout refuses a path outside the workspace, so this lands
+      # in a subdirectory rather than the literal ../wde used in local dev
+      # (see CLAUDE.md) — the compose steps below just cd into it directly.
       - name: Checkout WDE app
         uses: actions/checkout@v4
         with:
           repository: Gabriel-Leao51/wde
-          path: ../wde
+          path: wde-app
 
       # STRIPE_KEY only needs to be well-formed: this workflow's smoke test
       # doesn't exercise checkout, so a placeholder test key is enough to let
       # the app boot (the Stripe suite arrives in session 10).
       - name: Configure WDE app env
-        working-directory: ../wde
+        working-directory: wde-app
         run: |
           cp .env.example .env
           sed -i 's/^STRIPE_KEY=.*/STRIPE_KEY=sk_test_ci_placeholder/' .env
 
       - name: Start WDE stack
-        working-directory: ../wde
+        working-directory: wde-app
         run: docker compose up --build -d
 
       - name: Wait for WDE app to accept connections
@@ -73,5 +76,5 @@ jobs:
 
       - name: Dump WDE app logs on failure
         if: failure()
-        working-directory: ../wde
+        working-directory: wde-app
         run: docker compose logs
