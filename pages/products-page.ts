@@ -34,7 +34,6 @@ export class ProductsPage {
   readonly imagePreview: Locator;
   readonly summaryInput: Locator;
   readonly priceInput: Locator;
-  readonly departmentSelect: Locator;
   readonly launchDateInput: Locator;
   /** Quill's editable surface; the real `<textarea name="description">` is hidden and synced by Quill. */
   readonly descriptionEditor: Locator;
@@ -49,6 +48,16 @@ export class ProductsPage {
   readonly addToCartButton: Locator;
   /** The sanitized description HTML as rendered on the product details page. */
   readonly renderedDescription: Locator;
+
+  // Customer catalog: filter/sort form and live search
+  /** A product card in the currently rendered list, in whatever order the server sent them. */
+  readonly items: Locator;
+  /** Shared by the catalog's department filter and the admin form's department field - both are
+   * labeled "Department", and a page only ever renders one of them. */
+  readonly departmentSelect: Locator;
+  readonly sortSelect: Locator;
+  readonly filterButton: Locator;
+  readonly searchInput: Locator;
 
   constructor(readonly page: Page) {
     const main = page.getByRole('main');
@@ -78,6 +87,11 @@ export class ProductsPage {
     // A plain <div> with no role; the XSS checks also need tag-level queries (script, img) inside it.
     // eslint-disable-next-line playwright/no-raw-locators
     this.renderedDescription = main.locator('#product-description');
+
+    this.items = main.getByRole('article');
+    this.sortSelect = main.getByLabel('Sort by');
+    this.filterButton = main.getByRole('button', { name: 'Filter' });
+    this.searchInput = main.getByRole('combobox', { name: 'Search' });
   }
 
   async visitAdminList(): Promise<void> {
@@ -109,12 +123,9 @@ export class ProductsPage {
 
   /** A product card in the admin or customer product list. */
   item(productTitle: string): Locator {
-    return this.page
-      .getByRole('main')
-      .getByRole('article')
-      .filter({
-        has: this.page.getByRole('heading', { name: productTitle, level: 2, exact: true }),
-      });
+    return this.items.filter({
+      has: this.page.getByRole('heading', { name: productTitle, level: 2, exact: true }),
+    });
   }
 
   itemImage(productTitle: string): Locator {
@@ -219,5 +230,59 @@ export class ProductsPage {
     const productId = href?.split('/').pop();
     if (!productId) throw new Error(`No product id in the "View & Edit" link of "${productTitle}"`);
     await this.page.goto(`/products/${productId}`);
+  }
+
+  async visitCatalog(): Promise<void> {
+    await this.page.goto('/products');
+  }
+
+  async visitCatalogFilteredByDepartment(department: string): Promise<void> {
+    await this.page.goto(`/products?department=${encodeURIComponent(department)}`);
+  }
+
+  async visitCatalogSortedBy(sort: string): Promise<void> {
+    await this.page.goto(`/products?sort=${encodeURIComponent(sort)}`);
+  }
+
+  /**
+   * Select a department in the catalog's filter form and submit it. Waits for the resulting
+   * navigation: without it, reading the list right after the click can hit a torn-down execution
+   * context mid-navigation, the same WebKit race documented on `listedTitles`.
+   */
+  async filterByDepartment(departmentLabel: string): Promise<void> {
+    await this.departmentSelect.selectOption({ label: departmentLabel });
+    await this.filterButton.click();
+    await this.page.waitForURL(/\/products\?/);
+  }
+
+  /** Select an option in the catalog's sort form and submit it. See `filterByDepartment`. */
+  async sortByOption(sortLabel: string): Promise<void> {
+    await this.sortSelect.selectOption({ label: sortLabel });
+    await this.filterButton.click();
+    await this.page.waitForURL(/\/products\?/);
+  }
+
+  /**
+   * Titles of the currently rendered product list, in server order. Waits for the list to render
+   * first: a preceding filter/sort submission or `goto` is a full navigation, and reading text
+   * immediately can hit a torn-down execution context mid-navigation (seen on WebKit's timing).
+   */
+  async listedTitles(): Promise<string[]> {
+    await this.items.first().waitFor();
+    return this.items.getByRole('heading', { level: 2 }).allInnerTexts();
+  }
+
+  /** Prices of the currently rendered product list, in server order. See `listedTitles`. */
+  async listedPrices(): Promise<number[]> {
+    await this.items.first().waitFor();
+    // The price has no accessible role or label to query by.
+    // eslint-disable-next-line playwright/no-raw-locators
+    const priceTexts = await this.items.locator('.product-item-price').allInnerTexts();
+    return priceTexts.map((text) => Number.parseFloat(text.replace('$', '')));
+  }
+
+  /** A live-search suggestion in the search combobox's results list, matched by product title. */
+  searchSuggestion(productTitle: string): Locator {
+    return this.page.getByRole('option', { name: productTitle });
   }
 }

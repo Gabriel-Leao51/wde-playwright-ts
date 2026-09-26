@@ -12,7 +12,7 @@ docker compose up --build
 ```
 
 - App: `http://localhost:3000`
-- MongoDB: `127.0.0.1:27017` (published for the security suite's direct-DB scenarios)
+- MongoDB: `127.0.0.1:27017` (published for direct-DB scenarios — the catalog department filter check, and the security suite's from session 8)
 - Mailpit (SMTP capture + REST API): UI/API at `127.0.0.1:8025`, SMTP at `127.0.0.1:1025`
 
 To reset seed data (fresh products/users/orders): `docker compose down -v && docker compose up --build` — the `seed` service repopulates Mongo on every `up` after the volume is dropped.
