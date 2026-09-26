@@ -38,7 +38,7 @@ Plan approved 2026-09-22. Cadence: **one 1-hour session per day**, about 6–7 w
 
 Later skills, written from real experience rather than upfront:
 
-- `port-feature` (Python → TypeScript mapping: steps → `test.step`, `xdist_group` → serial mode, `scenario_context` → fixtures) right after session 5; delete it after parity.
+- `port-feature` (Python → TypeScript mapping: steps → inline test-body code, `xdist_group` → serial mode, `scenario_context` → a local variable, `@xfail` → `test.fail()`) — added after session 5; delete it after parity.
 - `redesign-page` after session 16, once the design tokens exist.
 - `visual-baselines` (Docker commands) when first needed.
 - Consider installing the official `frontend-design` plugin before Phase C.
@@ -52,7 +52,7 @@ Later skills, written from real experience rather than upfront:
 
 ## Phase B — Parity with the Python suite
 
-- [ ] **5.** Admin login, authentication, authorization (7 scenarios)
+- [x] **5.** Admin login, authentication, authorization (7 scenarios)
 - [ ] **6.** Product CRUD (7). `test.describe.configure({ mode: 'serial' })` replaces the `xdist_group` hack.
 - [ ] **7.** Catalog filter/sort (9), as data-driven tests
 - [ ] **8.** Security hardening (7), using the `request` fixture for API-level checks
@@ -91,3 +91,4 @@ Later skills, written from real experience rather than upfront:
 - 2026-09-24, Session 2: done. `test-data/` (JSON copied from the Python suite, typed via `satisfies`), `fixtures/` (`test.extend` with `loginPage`, `setLanguage`, and a `loggedInAs` option that swaps `storageState`), and a `setup` project that logs admin and customer in once. 11/11 green locally on all 3 browsers. Only `LoginPage`'s login flow is ported so far; session 3 ports the full 6 page objects and adds them as fixtures. There's no CI yet (session 4).
 - 2026-09-24, Session 3: done. Ported cart, login, OTP login, orders, products and Stripe checkout page objects as fixtures, with role/label locators (checked against the live stack and Stripe on all 3 browsers by a throwaway probe, not committed). Found and fixed two races (see Decisions). Open for session 10: Stripe's fields sometimes stay non-editable on Firefox when several checkouts run in parallel; serially 4/4 pass.
 - 2026-09-24, Session 4: done. `.github/workflows/ci.yml`: checks out this repo plus `Gabriel-Leao51/wde` into a `wde-app` subdirectory (`actions/checkout` rejects a `path` outside the runner's workspace, so the local-dev `../wde` sibling convention from `CLAUDE.md` doesn't translate directly to CI), writes a placeholder `STRIPE_KEY` into `.env` (no real key needed until session 10's Stripe suite), brings up the stack with `docker compose up --build`, polls `curl` until the app answers, then runs `tests/fixtures.spec.ts` (the setup project plus all 3 smoke tests) as a chromium/firefox/webkit matrix and uploads the HTML report per leg. Verified the full flow locally first (build, boot, curl wait, `npx playwright test --project=chromium`, 5/5 green), pushed, hit the checkout path error, fixed it, and confirmed CI green via the raw API on all 3 matrix legs (run 36070345525).
+- 2026-09-25, Session 5: done. Ported all 7 admin login/authentication/authorization scenarios: `tests/admin-login.spec.ts` (successful login, invalid credentials) and `tests/admin-panel-protection.spec.ts` (401 for a guest hitting `/admin/products` or `/admin/orders`; 403 for a logged-in customer). While porting the Python suite's `@xfail` authorization scenarios, verified live (not just by reading source) that BUG-AUTH-001/002 are still present: `middlewares/protect-routes.js` in `wde` checks `req.path.startsWith('/admin')`, but Express strips the mount prefix for middleware registered via `app.use('/admin', middleware, router)`, so the check never trips and a logged-in customer can reach every admin page/form. Ported those 3 scenarios as `test.fail()` assertions of the secure behavior (mirrors pytest's strict `xfail`) rather than skipping them. 12/12 green on chromium, 23/23 across all 3 browsers, no regressions in the existing suite. Wrote the `port-feature` skill (real mapping learned: steps → inline test-body code, not step functions; `scenario_context` → a local variable; `xdist_group` → serial mode; `@xfail` → `test.fail()`).
