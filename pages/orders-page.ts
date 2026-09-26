@@ -5,9 +5,16 @@ export type OrderStatus = 'Pending' | 'Fulfilled' | 'Cancelled';
 /** Admin order table at /admin/orders. Rows are looked up by order id. */
 export class OrdersPage {
   readonly manageOrdersLink: Locator;
+  readonly customerOrdersLink: Locator;
+  /** The customer's own invoice link; `.first()` matches the Python suite's intent of "my order". */
+  readonly downloadInvoiceLink: Locator;
 
   constructor(readonly page: Page) {
     this.manageOrdersLink = page.getByRole('banner').getByRole('link', { name: 'Manage Orders' });
+    this.customerOrdersLink = page
+      .getByRole('banner')
+      .getByRole('link', { name: 'Orders', exact: true });
+    this.downloadInvoiceLink = page.getByRole('link', { name: 'Download Invoice' }).first();
   }
 
   async visit(): Promise<void> {
@@ -18,6 +25,11 @@ export class OrdersPage {
   async openFromHeader(): Promise<void> {
     await this.manageOrdersLink.click();
     await this.page.waitForURL('**/admin/orders');
+  }
+
+  async openFromCustomerNav(): Promise<void> {
+    await this.customerOrdersLink.click();
+    await this.page.waitForURL('**/orders');
   }
 
   row(orderId: string): Locator {
