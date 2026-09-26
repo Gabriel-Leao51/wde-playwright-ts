@@ -38,6 +38,8 @@ export class ProductsPage {
   /** Quill's editable surface; the real `<textarea name="description">` is hidden and synced by Quill. */
   readonly descriptionEditor: Locator;
   readonly saveButton: Locator;
+  /** The add/edit form element itself, e.g. for checking its `action` attribute. */
+  readonly productForm: Locator;
 
   // Delete confirmation (admin list)
   readonly deleteDialog: Locator;
@@ -78,6 +80,9 @@ export class ProductsPage {
     // eslint-disable-next-line playwright/no-raw-locators
     this.descriptionEditor = main.locator('.ql-editor');
     this.saveButton = main.getByRole('button', { name: 'Save' });
+    // The form has no accessible role (forms only get one when given an accessible name).
+    // eslint-disable-next-line playwright/no-raw-locators
+    this.productForm = main.locator('form').first();
 
     this.deleteDialog = page.getByRole('dialog');
     this.confirmDeleteButton = this.deleteDialog.getByRole('button', { name: 'Delete' });
