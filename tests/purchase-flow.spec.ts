@@ -36,7 +36,17 @@ test.describe('customer purchase flow', () => {
     productsPage,
     cartPage,
     stripeCheckoutPage,
+    browserName,
   }) => {
+    // GitHub Actions' runner IPs get Stripe/Cloudflare's bot mitigation to serve checkout.stripe.com's
+    // own "Something went wrong" error page to Playwright's bundled WebKit before any form renders -
+    // confirmed reproducible on 2 separate CI runs, while the identical flow passes locally on WebKit
+    // against the same stack. Chromium and Firefox are unaffected in CI, so this only skips there.
+    test.skip(
+      browserName === 'webkit' && !!process.env.CI,
+      'Stripe/Cloudflare blocks Playwright WebKit from GitHub Actions runners; passes locally',
+    );
+
     await loginPage.login(users.customer.email, users.customer.password);
     await productsPage.visitCatalog();
     await productsPage.openDetails(productTitle);
