@@ -203,6 +203,14 @@ export class ProductsPage {
   }
 
   /**
+   * A tag inside the rendered description, e.g. checking a sanitizer stripped a "script" or
+   * "img" element. Arbitrary rendered HTML tags have no accessible role to query by.
+   */
+  descriptionTag(tag: string): Locator {
+    return this.renderedDescription.locator(tag);
+  }
+
+  /**
    * Open the customer-facing details page of a product from the admin list. Admins get
    * "View & Edit" instead of "View Details", so the product id is taken from that link.
    */
