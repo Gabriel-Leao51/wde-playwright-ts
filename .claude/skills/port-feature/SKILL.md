@@ -9,17 +9,17 @@ Source: `C:\Users\gabri\Documents\wde_automacao` (`features/**/*.feature` + `ste
 
 ## Structural mapping
 
-| pytest-bdd | Playwright Test |
-|---|---|
-| `Feature:` | `test.describe(...)` |
-| `Scenario:` | one `test(...)` |
-| `Background:` shared `Given` | `test.use({ loggedInAs: ... })` at the describe level, or a page-object action called at the top of each test if the given can't be a fixture |
-| `Given`/`When`/`Then` step functions | inline code in the test body, in order — there is no separate step-definition layer to recreate |
-| `scenario_context` fixture (a dict passed between step functions to share state within one scenario) | a plain local variable in the test body. One test function already *is* the whole scenario, so there's nothing to smuggle state through |
-| `@pytest.mark.xdist_group(name=...)` (scenarios that must share a worker because they mutate the same app state across scenarios) | `test.describe.configure({ mode: 'serial' })` on that describe block |
-| `@xfail` tag on a known-bug scenario | `test.fail(true, 'BUG-ID: one-line root cause')` at the top of the test body — see "Known-bug scenarios" below |
-| Scenario Outline / Examples table | a `for (const row of data) { test(\`...${row.x}\`, ...) }` loop outside `test.describe`; Playwright has no native outline syntax |
-| Session/module-scoped pytest fixtures (`users`, `*_page`) | already ported once, in `fixtures/index.ts` and `test-data/index.ts` — don't re-port per feature, just consume them |
+| pytest-bdd                                                                                                                        | Playwright Test                                                                                                                               |
+| --------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Feature:`                                                                                                                        | `test.describe(...)`                                                                                                                          |
+| `Scenario:`                                                                                                                       | one `test(...)`                                                                                                                               |
+| `Background:` shared `Given`                                                                                                      | `test.use({ loggedInAs: ... })` at the describe level, or a page-object action called at the top of each test if the given can't be a fixture |
+| `Given`/`When`/`Then` step functions                                                                                              | inline code in the test body, in order — there is no separate step-definition layer to recreate                                               |
+| `scenario_context` fixture (a dict passed between step functions to share state within one scenario)                              | a plain local variable in the test body. One test function already _is_ the whole scenario, so there's nothing to smuggle state through       |
+| `@pytest.mark.xdist_group(name=...)` (scenarios that must share a worker because they mutate the same app state across scenarios) | `test.describe.configure({ mode: 'serial' })` on that describe block                                                                          |
+| `@xfail` tag on a known-bug scenario                                                                                              | `test.fail(true, 'BUG-ID: one-line root cause')` at the top of the test body — see "Known-bug scenarios" below                                |
+| Scenario Outline / Examples table                                                                                                 | a `for` loop over the data, generating one `test()` per row, outside `test.describe`; Playwright has no native outline syntax                 |
+| Session/module-scoped pytest fixtures (`users`, `*_page`)                                                                         | already ported once, in `fixtures/index.ts` and `test-data/index.ts` — don't re-port per feature, just consume them                           |
 
 ## Step-by-step
 
@@ -34,7 +34,7 @@ Source: `C:\Users\gabri\Documents\wde_automacao` (`features/**/*.feature` + `ste
 When the Python suite tags a scenario `@xfail` for a known app bug:
 
 1. Re-verify the bug still reproduces against the current `wde` app (don't assume the old annotation is still accurate — it may have been fixed, or the symptom may have changed).
-2. If it still reproduces, write the test asserting the **secure/correct** behavior (what should happen), then mark it with `test.fail(true, 'BUG-ID: short root cause')` at the top of the test body. This mirrors pytest's strict `xfail`: the test is expected to fail, and Playwright flags an *unexpected pass* as a run failure — which is exactly the signal you want when the app eventually fixes the bug.
+2. If it still reproduces, write the test asserting the **secure/correct** behavior (what should happen), then mark it with `test.fail(true, 'BUG-ID: short root cause')` at the top of the test body. This mirrors pytest's strict `xfail`: the test is expected to fail, and Playwright flags an _unexpected pass_ as a run failure — which is exactly the signal you want when the app eventually fixes the bug.
 3. Put the actual root cause in the reason string and a fuller comment above the `describe`/`test`, e.g. session 5's finding: `protectRoutes` in `wde/middlewares/protect-routes.js` checks `req.path.startsWith('/admin')`, but Express strips the mount prefix for middleware registered via `app.use('/admin', middleware, router)`, so `req.path` is already relative (`/products`, not `/admin/products`) and the check never trips.
 
 ## Example (session 5)

@@ -51,4 +51,29 @@ export class OrdersPage {
     await row.getByRole('button', { name: 'Update' }).click();
     await response;
   }
+
+  columnHeader(label: string): Locator {
+    return this.page.getByRole('columnheader', { name: label });
+  }
+
+  /** Every order row, identified by its "Update" button (the header row has none). */
+  private orderRows(): Locator {
+    return this.page
+      .getByRole('row')
+      .filter({ has: this.page.getByRole('button', { name: 'Update' }) });
+  }
+
+  /**
+   * The status text of every order row, top to bottom, for asserting sort order after clicking
+   * `columnHeader('Status')`. Read by position (5th cell) since the status badge itself has no
+   * accessible name to filter by - unlike `statusCell`, this doesn't know the status in advance.
+   */
+  async statusValues(): Promise<string[]> {
+    const rows = await this.orderRows().all();
+    const values: string[] = [];
+    for (const row of rows) {
+      values.push((await row.getByRole('cell').nth(4).innerText()).trim());
+    }
+    return values;
+  }
 }

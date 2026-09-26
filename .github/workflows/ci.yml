@@ -26,14 +26,16 @@ jobs:
           repository: Gabriel-Leao51/wde
           path: wde-app
 
-      # STRIPE_KEY only needs to be well-formed: this workflow's smoke test
-      # doesn't exercise checkout, so a placeholder test key is enough to let
-      # the app boot (the Stripe suite arrives in session 10).
+      # Session 10's Stripe purchase-flow test exercises a real Checkout
+      # session, so this needs an actual Stripe test-mode secret key, not a
+      # placeholder — stored as the STRIPE_KEY repo secret.
       - name: Configure WDE app env
         working-directory: wde-app
         run: |
           cp .env.example .env
-          sed -i 's/^STRIPE_KEY=.*/STRIPE_KEY=sk_test_ci_placeholder/' .env
+          sed -i "s/^STRIPE_KEY=.*/STRIPE_KEY=${STRIPE_KEY}/" .env
+        env:
+          STRIPE_KEY: ${{ secrets.STRIPE_KEY }}
 
       - name: Start WDE stack
         working-directory: wde-app

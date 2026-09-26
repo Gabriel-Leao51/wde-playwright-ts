@@ -36,3 +36,24 @@ export async function retrieveOtpCode(email: string): Promise<string | undefined
   const detail = (await detailResponse.json()) as MailpitMessageDetail;
   return /\b(\d{6})\b/.exec(detail.Text)?.[1];
 }
+
+/**
+ * Whether Mailpit has an order confirmation email for `orderId` addressed to `customerEmail`.
+ * `orderConfirmationEmail.js` embeds the order id in the subject (`Order Confirmation (#<id>)`),
+ * which is enough to be sure this is the email this specific purchase triggered, not a stray
+ * message left over from a concurrently-running worker. Callers poll this (e.g. with
+ * `expect.poll`) since Mailpit indexes an SMTP-delivered message some time after the app hands it
+ * off, not the instant the success page renders.
+ */
+export async function hasOrderConfirmationEmail(
+  orderId: string,
+  customerEmail: string,
+): Promise<boolean> {
+  const response = await fetch(`${MAILPIT_BASE_URL}/api/v1/messages`);
+  const body = (await response.json()) as MailpitMessagesResponse;
+  return body.messages.some(
+    (message) =>
+      message.Subject.includes(orderId) &&
+      message.To.some((recipient) => recipient.Address === customerEmail),
+  );
+}
