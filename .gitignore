@@ -7,6 +7,12 @@ node_modules/
 /playwright/.cache/
 /playwright/.auth/
 
+# Visual baselines are generated only in the Linux Docker image (see CLAUDE.md and the
+# visual-baselines skill) - a local Windows/Mac run writes one of these by mistake when a
+# baseline is missing, and it must never be committed.
+*-snapshots/*-win32.png
+*-snapshots/*-darwin.png
+
 # Local env overrides
 .env
 .env.*

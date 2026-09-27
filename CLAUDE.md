@@ -43,7 +43,7 @@ Import `test`/`expect` from `fixtures/`, not `@playwright/test`. The `setup` pro
 
 ## Visual baselines
 
-Generate/update `toHaveScreenshot()` baselines **only** inside the Linux `mcr.microsoft.com/playwright` Docker image, never on Windows — font rendering differs enough to make local baselines useless in CI (`ubuntu-latest`). See the `visual-baselines` skill once it exists (planned after session 12).
+Generate/update `toHaveScreenshot()` baselines **only** inside the Linux `mcr.microsoft.com/playwright` Docker image, never on Windows — font rendering differs enough to make local baselines useless in CI (`ubuntu-latest`). See the `visual-baselines` skill for the exact Docker commands. A plain local `npm test` on Windows will fail visual-regression tests (missing `-win32` baselines by design) — verify those via that skill or CI instead.
 
 ## CI
 
@@ -53,3 +53,4 @@ Check CI status via the raw GitHub REST API (`/actions/runs` filtered by `head_s
 
 - `/session` — read `ROADMAP.md`, pick the next unchecked session, keep it to ~1 hour, end green and committed, tick the box, verify CI.
 - `ci-check` — the raw-API CI procedure.
+- `visual-baselines` — the Docker commands for generating/updating `toHaveScreenshot()` baselines.
