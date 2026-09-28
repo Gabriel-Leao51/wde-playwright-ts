@@ -62,5 +62,7 @@ Playwright's default snapshot naming already bakes in the browser project and pl
 
 ## Notes
 
+- The container's `npm ci` runs inside the mounted repo, so it replaces the host's `node_modules` with Linux binaries. Run `npm ci` on the host afterwards, or `npx playwright` fails with "not recognized".
+- To refresh one page's baselines only, add `--grep '<test title>'` to the `--update-snapshots` run; the other baselines stay untouched.
 - A plain local `npx playwright test`/`npm test` on Windows will fail any visual-regression test with "snapshot doesn't exist" (it looks for a `-win32` file that's never generated or committed). That's expected, not a regression — verify visual tests via this Docker workflow or via CI (`ci-check` skill), not a bare Windows run.
 - **Redesign loop (Phase C)**, per `ROADMAP.md`: change the page → run the suite → fix any broken locators → regenerate that page's baseline with this skill → commit → check CI.
