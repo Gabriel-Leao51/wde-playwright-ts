@@ -31,7 +31,7 @@ test.describe('language selector', () => {
     await page.goto('/products/000000000000000000000001');
 
     await expect(
-      page.getByRole('heading', { name: 'GTRACING - Cadeira Gamer Preta', level: 1 }),
+      page.getByRole('heading', { name: 'Cadeira Gamer Vermelha e Preta', level: 1 }),
     ).toBeVisible();
   });
 

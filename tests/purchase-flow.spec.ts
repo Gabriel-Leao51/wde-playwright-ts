@@ -2,7 +2,7 @@ import { hasOrderConfirmationEmail } from '../lib/mailpit';
 import { expect, test } from '../fixtures';
 import { users } from '../test-data';
 
-const productTitle = 'GTRACING - Black Gaming Chair';
+const productTitle = 'Red and Black Gaming Chair';
 
 /** The `orderId` query param off the success page URL, e.g. `.../orders/success?orderId=...`. */
 function orderIdFromSuccessUrl(url: string): string {

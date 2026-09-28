@@ -1,7 +1,7 @@
 import { expect, test } from '../fixtures';
 import { users } from '../test-data';
 
-const productTitle = 'GTRACING - Black Gaming Chair';
+const productTitle = 'Red and Black Gaming Chair';
 const productPrice = 249.99;
 
 test.describe('cart quantity and removal', () => {

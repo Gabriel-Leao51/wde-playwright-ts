@@ -79,8 +79,8 @@ test.describe('catalog filter and sort', () => {
 
     await productsPage.searchInput.fill('chair');
 
-    await expect(productsPage.searchSuggestion('GTRACING - Black Gaming Chair')).toBeVisible();
-    await expect(productsPage.searchSuggestion('Ergonomic Office Chair')).toBeVisible();
+    await expect(productsPage.searchSuggestion('Red and Black Gaming Chair')).toBeVisible();
+    await expect(productsPage.searchSuggestion('Ergonomic Mesh Office Chair')).toBeVisible();
   });
 
   test('selecting a search suggestion navigates to that product', async ({
@@ -90,10 +90,10 @@ test.describe('catalog filter and sort', () => {
     await productsPage.visitCatalog();
     await productsPage.searchInput.fill('chair');
 
-    await productsPage.searchSuggestion('Ergonomic Office Chair').click();
+    await productsPage.searchSuggestion('Ergonomic Mesh Office Chair').click();
 
     await expect(
-      page.getByRole('heading', { name: 'Ergonomic Office Chair', level: 1 }),
+      page.getByRole('heading', { name: 'Ergonomic Mesh Office Chair', level: 1 }),
     ).toBeVisible();
   });
 
@@ -101,6 +101,6 @@ test.describe('catalog filter and sort', () => {
     const response = await request.get('/api/products/search?q=yoga');
     const body = (await response.json()) as { results: { title: string }[] };
 
-    expect(body.results.map((product) => product.title)).toContain('Yoga Mat');
+    expect(body.results.map((product) => product.title)).toContain('Yoga Mat and Cork Blocks');
   });
 });

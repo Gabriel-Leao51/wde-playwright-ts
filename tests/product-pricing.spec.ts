@@ -1,9 +1,9 @@
 import { expect, test } from '../fixtures';
 
-const productTitleEn = 'GTRACING - Black Gaming Chair';
+const productTitleEn = 'Red and Black Gaming Chair';
 // The catalog and detail pages localize the product title itself (see language-selector.spec.ts),
 // so the pt-language test below has to look the item up by its Portuguese title.
-const productTitlePt = 'GTRACING - Cadeira Gamer Preta';
+const productTitlePt = 'Cadeira Gamer Vermelha e Preta';
 const priceText = /^\$\d+\.\d{2}$/;
 
 test.describe('product price formatting', () => {
