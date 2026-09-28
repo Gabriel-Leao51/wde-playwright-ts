@@ -1,10 +1,10 @@
 import { authFile, expect, test as setup } from '../fixtures';
 import { roles, users, type Role } from '../test-data';
 
-/** A header link only this role sees once logged in. */
-const roleLandmark: Record<Role, string> = {
-  admin: 'Manage Products',
-  customer: 'Orders',
+/** A header control only this role sees once logged in. */
+const roleLandmark: Record<Role, { role: 'link' | 'button'; name: string }> = {
+  admin: { role: 'link', name: 'Manage Products' },
+  customer: { role: 'button', name: 'Account' },
 };
 
 for (const role of roles) {
@@ -12,9 +12,8 @@ for (const role of roles) {
     const { email, password } = users[role];
     await loginPage.login(email, password);
 
-    await expect(
-      page.getByRole('banner').getByRole('link', { name: roleLandmark[role] }),
-    ).toBeVisible();
+    const { role: landmarkRole, name } = roleLandmark[role];
+    await expect(page.getByRole('banner').getByRole(landmarkRole, { name })).toBeVisible();
     await page.context().storageState({ path: authFile(role) });
   });
 }

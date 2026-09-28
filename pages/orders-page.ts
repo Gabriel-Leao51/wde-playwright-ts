@@ -28,6 +28,8 @@ export class OrdersPage {
   }
 
   async openFromCustomerNav(): Promise<void> {
+    // "Orders" sits in the account menu, which starts closed.
+    await this.page.getByRole('banner').getByRole('button', { name: 'Account' }).click();
     await this.customerOrdersLink.click();
     await this.page.waitForURL('**/orders');
   }

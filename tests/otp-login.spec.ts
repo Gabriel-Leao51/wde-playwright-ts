@@ -36,7 +36,7 @@ test.describe('OTP login', () => {
     const code = await waitForOtpCode(users.customer.email);
     await otpLoginPage.submitCode(code);
 
-    await expect(page.getByRole('banner').getByRole('link', { name: 'Orders' })).toBeVisible();
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Account' })).toBeVisible();
   });
 
   test('a login code becomes invalid after too many wrong attempts', async ({

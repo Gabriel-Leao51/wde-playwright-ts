@@ -20,7 +20,7 @@ test.describe('saved customer session', () => {
   test('opens the order history without logging in', async ({ page }) => {
     await page.goto('/orders');
 
-    await expect(page.getByRole('banner').getByRole('link', { name: 'Orders' })).toBeVisible();
+    await expect(page.getByRole('banner').getByRole('button', { name: 'Account' })).toBeVisible();
   });
 });
 

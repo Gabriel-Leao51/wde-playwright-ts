@@ -96,7 +96,8 @@ export class ProductsPage {
     this.items = main.getByRole('article');
     this.sortSelect = main.getByLabel('Sort by');
     this.filterButton = main.getByRole('button', { name: 'Filter' });
-    this.searchInput = main.getByRole('combobox', { name: 'Search' });
+    // The search box lives in the site header, so it is available on every page.
+    this.searchInput = page.getByRole('banner').getByRole('combobox', { name: 'Search' });
   }
 
   async visitAdminList(): Promise<void> {

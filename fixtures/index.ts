@@ -3,6 +3,7 @@ import path from 'node:path';
 import { test as base } from '@playwright/test';
 
 import { CartPage } from '../pages/cart-page';
+import { Header } from '../pages/header';
 import { LoginPage } from '../pages/login-page';
 import { OrdersPage } from '../pages/orders-page';
 import { OtpLoginPage } from '../pages/otp-login-page';
@@ -28,6 +29,7 @@ interface Options {
 
 interface Fixtures {
   cartPage: CartPage;
+  header: Header;
   loginPage: LoginPage;
   ordersPage: OrdersPage;
   otpLoginPage: OtpLoginPage;
@@ -46,6 +48,9 @@ export const test = base.extend<Fixtures & Options>({
 
   cartPage: async ({ page }, use) => {
     await use(new CartPage(page));
+  },
+  header: async ({ page }, use) => {
+    await use(new Header(page));
   },
   loginPage: async ({ page }, use) => {
     await use(new LoginPage(page));

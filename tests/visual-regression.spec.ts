@@ -44,3 +44,13 @@ test.describe('Visual regression', () => {
     await expect(page).toHaveScreenshot('product-details.png', { fullPage: true });
   });
 });
+
+// Dark baselines cover one page per template (see ROADMAP.md, Dark mode); the header is shared.
+test.describe('Visual regression, dark theme', () => {
+  test.use({ colorScheme: 'dark' });
+
+  test('login page, dark', async ({ page, loginPage }) => {
+    await loginPage.visit();
+    await expect(page).toHaveScreenshot('login-dark.png', { fullPage: true });
+  });
+});
