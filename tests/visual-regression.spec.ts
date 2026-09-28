@@ -9,6 +9,11 @@ import { test, expect } from '../fixtures';
  * per CLAUDE.md, never on Windows.
  */
 test.describe('Visual regression', () => {
+  test('home page', async ({ page, homePage }) => {
+    await homePage.visit();
+    await expect(page).toHaveScreenshot('home.png', { fullPage: true });
+  });
+
   test('login page', async ({ page, loginPage }) => {
     await loginPage.visit();
     await expect(page).toHaveScreenshot('login.png', { fullPage: true });
@@ -48,6 +53,11 @@ test.describe('Visual regression', () => {
 // Dark baselines cover one page per template (see ROADMAP.md, Dark mode); the header is shared.
 test.describe('Visual regression, dark theme', () => {
   test.use({ colorScheme: 'dark' });
+
+  test('home page, dark', async ({ page, homePage }) => {
+    await homePage.visit();
+    await expect(page).toHaveScreenshot('home-dark.png', { fullPage: true });
+  });
 
   test('login page, dark', async ({ page, loginPage }) => {
     await loginPage.visit();
