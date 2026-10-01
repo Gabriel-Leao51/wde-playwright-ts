@@ -7,12 +7,21 @@ export class CartPage {
   readonly total: Locator;
   /** Placeholder a removed item shows for ~2s before its row disappears. */
   readonly itemRemovedMessage: Locator;
+  readonly emptyHeading: Locator;
+  readonly continueShoppingLink: Locator;
+  /** The order summary panel beside (or below) the item list. */
+  readonly summary: Locator;
+  readonly summaryItems: Locator;
 
   constructor(readonly page: Page) {
     const main = page.getByRole('main');
     this.buyProductsButton = main.getByRole('button', { name: 'Buy Products' });
     this.total = main.getByText(/^Total: \$/);
     this.itemRemovedMessage = main.getByText('Item removed', { exact: true });
+    this.emptyHeading = main.getByRole('heading', { name: 'Your cart is empty', level: 2 });
+    this.continueShoppingLink = main.getByRole('link', { name: 'Continue shopping' });
+    this.summary = main.getByRole('complementary', { name: 'Order summary' });
+    this.summaryItems = this.summary.getByText(/^Items: \d+$/);
   }
 
   async visit(): Promise<void> {
@@ -46,5 +55,13 @@ export class CartPage {
 
   removeButton(productTitle: string): Locator {
     return this.item(productTitle).getByRole('button', { name: 'Remove item' });
+  }
+
+  thumbnail(productTitle: string): Locator {
+    return this.item(productTitle).getByRole('img', { name: productTitle, exact: true });
+  }
+
+  titleLink(productTitle: string): Locator {
+    return this.item(productTitle).getByRole('link', { name: productTitle, exact: true });
   }
 }

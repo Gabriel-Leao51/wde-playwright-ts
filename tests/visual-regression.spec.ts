@@ -1,4 +1,19 @@
+import type { Page } from '@playwright/test';
 import { test, expect } from '../fixtures';
+import { users } from '../test-data';
+
+/** Logs in fresh (a cart mutates the shared session) and puts the seed chair in the cart. */
+async function openCartWithChair(
+  page: Page,
+  loginPage: { login(email: string, password: string): Promise<void> },
+): Promise<void> {
+  await loginPage.login(users.customer.email, users.customer.password);
+  await page.goto('/products/000000000000000000000001');
+  await page.getByRole('button', { name: 'Add to Cart' }).click();
+  await expect(page.getByText('Added to cart!', { exact: true })).toBeVisible();
+  await page.goto('/cart');
+  await expect(page.getByRole('img', { name: 'Red and Black Gaming Chair' })).toBeVisible();
+}
 
 /**
  * Full-page screenshots of static, unauthenticated pages via native `toHaveScreenshot`.
@@ -42,6 +57,13 @@ test.describe('Visual regression', () => {
   test('empty cart, guest', async ({ page, cartPage }) => {
     await cartPage.visit();
     await expect(page).toHaveScreenshot('cart-empty.png', { fullPage: true });
+  });
+
+  test('cart with an item', async ({ page, loginPage, browserName }) => {
+    // eslint-disable-next-line playwright/no-skipped-test -- WebKit intermittently leaves the self-hosted Inter unloaded on this second in-context navigation, so its text renders differently run to run; see ROADMAP.md session 22.
+    test.skip(browserName === 'webkit', 'flaky font loading in WebKit');
+    await openCartWithChair(page, loginPage);
+    await expect(page).toHaveScreenshot('cart-item.png', { fullPage: true });
   });
 
   test('product card', async ({ productsPage }) => {
@@ -99,6 +121,13 @@ test.describe('Visual regression, dark theme', () => {
   test('product details page, dark', async ({ page }) => {
     await page.goto('/products/000000000000000000000001');
     await expect(page).toHaveScreenshot('product-details-dark.png', { fullPage: true });
+  });
+
+  test('cart with an item, dark', async ({ page, loginPage, browserName }) => {
+    // eslint-disable-next-line playwright/no-skipped-test -- same WebKit font-loading flake as the light cart baseline.
+    test.skip(browserName === 'webkit', 'flaky font loading in WebKit');
+    await openCartWithChair(page, loginPage);
+    await expect(page).toHaveScreenshot('cart-item-dark.png', { fullPage: true });
   });
 
   test('login page, dark', async ({ page, loginPage }) => {
