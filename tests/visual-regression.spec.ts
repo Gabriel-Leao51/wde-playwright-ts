@@ -44,6 +44,13 @@ test.describe('Visual regression', () => {
     await expect(page).toHaveScreenshot('cart-empty.png', { fullPage: true });
   });
 
+  test('product card', async ({ productsPage }) => {
+    await productsPage.visitCatalog();
+    await expect(productsPage.item('Red and Black Gaming Chair')).toHaveScreenshot(
+      'product-card.png',
+    );
+  });
+
   test('product details page', async ({ page }) => {
     await page.goto('/products/000000000000000000000001');
     await expect(page).toHaveScreenshot('product-details.png', { fullPage: true });
@@ -57,6 +64,13 @@ test.describe('Visual regression, dark theme', () => {
   test('home page, dark', async ({ page, homePage }) => {
     await homePage.visit();
     await expect(page).toHaveScreenshot('home-dark.png', { fullPage: true });
+  });
+
+  test('product card, dark', async ({ productsPage }) => {
+    await productsPage.visitCatalog();
+    await expect(productsPage.item('Red and Black Gaming Chair')).toHaveScreenshot(
+      'product-card-dark.png',
+    );
   });
 
   test('login page, dark', async ({ page, loginPage }) => {
