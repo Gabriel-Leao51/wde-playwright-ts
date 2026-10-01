@@ -50,6 +50,9 @@ export class ProductsPage {
   readonly addToCartButton: Locator;
   /** The sanitized description HTML as rendered on the product details page. */
   readonly renderedDescription: Locator;
+  readonly breadcrumbs: Locator;
+  /** The "Related products" section of the details page; its cards are `articles` inside it. */
+  readonly relatedProducts: Locator;
 
   // Customer catalog: filter/sort form and live search
   /** A product card in the currently rendered list, in whatever order the server sent them. */
@@ -95,6 +98,9 @@ export class ProductsPage {
     // A plain <div> with no role; the XSS checks also need tag-level queries (script, img) inside it.
     // eslint-disable-next-line playwright/no-raw-locators
     this.renderedDescription = main.locator('#product-description');
+
+    this.breadcrumbs = main.getByRole('navigation', { name: 'Breadcrumb' });
+    this.relatedProducts = main.getByRole('region', { name: 'Related products' });
 
     this.items = main.getByRole('article');
     this.sortSelect = main.getByLabel('Sort by');

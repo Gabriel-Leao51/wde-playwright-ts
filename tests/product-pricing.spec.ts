@@ -15,7 +15,8 @@ test.describe('product price formatting', () => {
     await expect(productsPage.item(productTitleEn).getByText(priceText)).toHaveText('$249.99');
 
     await productsPage.openDetails(productTitleEn);
-    await expect(page.getByRole('main').getByText(priceText)).toHaveText('$249.99');
+    // The product's own price comes first; related products further down have prices too.
+    await expect(page.getByRole('main').getByText(priceText).first()).toHaveText('$249.99');
   });
 
   test('formats the price the same way regardless of the storefront language', async ({
