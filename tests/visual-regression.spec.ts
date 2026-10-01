@@ -51,6 +51,21 @@ test.describe('Visual regression', () => {
     );
   });
 
+  // Element shots of the static sidebar, and the empty results page (no products, so concurrent
+  // catalog edits can't change it).
+  test('catalog filter sidebar', async ({ page, productsPage }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await productsPage.visitCatalog();
+    await expect(page.getByRole('complementary', { name: 'Filters' })).toHaveScreenshot(
+      'catalog-sidebar.png',
+    );
+  });
+
+  test('catalog empty state', async ({ page, productsPage }) => {
+    await productsPage.visitCatalogFilteredByDepartment('Nonexistent');
+    await expect(page).toHaveScreenshot('catalog-empty.png', { fullPage: true });
+  });
+
   test('product details page', async ({ page }) => {
     await page.goto('/products/000000000000000000000001');
     await expect(page).toHaveScreenshot('product-details.png', { fullPage: true });
@@ -70,6 +85,14 @@ test.describe('Visual regression, dark theme', () => {
     await productsPage.visitCatalog();
     await expect(productsPage.item('Red and Black Gaming Chair')).toHaveScreenshot(
       'product-card-dark.png',
+    );
+  });
+
+  test('catalog filter sidebar, dark', async ({ page, productsPage }) => {
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await productsPage.visitCatalog();
+    await expect(page.getByRole('complementary', { name: 'Filters' })).toHaveScreenshot(
+      'catalog-sidebar-dark.png',
     );
   });
 

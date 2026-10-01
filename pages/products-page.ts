@@ -59,6 +59,9 @@ export class ProductsPage {
   readonly departmentSelect: Locator;
   readonly sortSelect: Locator;
   readonly filterButton: Locator;
+  readonly clearFiltersLink: Locator;
+  /** "N products" line above the grid. */
+  readonly resultCount: Locator;
   readonly searchInput: Locator;
 
   constructor(readonly page: Page) {
@@ -96,6 +99,8 @@ export class ProductsPage {
     this.items = main.getByRole('article');
     this.sortSelect = main.getByLabel('Sort by');
     this.filterButton = main.getByRole('button', { name: 'Filter' });
+    this.clearFiltersLink = main.getByRole('link', { name: 'Clear filters' });
+    this.resultCount = main.getByRole('status');
     // The search box lives in the site header, so it is available on every page.
     this.searchInput = page.getByRole('banner').getByRole('combobox', { name: 'Search' });
   }
