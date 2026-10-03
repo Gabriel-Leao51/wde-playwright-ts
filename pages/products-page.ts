@@ -26,6 +26,10 @@ const mimeTypes: Record<string, string> = { '.jpg': 'image/jpeg', '.png': 'image
 export class ProductsPage {
   readonly manageProductsLink: Locator;
   readonly addProductLink: Locator;
+  /** The admin shell's sidebar nav, present on every admin page. */
+  readonly adminSidebar: Locator;
+  /** The admin product table; its rows are found by title via item(). */
+  readonly adminTable: Locator;
 
   // Add/edit form
   readonly titleInput: Locator;
@@ -69,9 +73,9 @@ export class ProductsPage {
 
   constructor(readonly page: Page) {
     const main = page.getByRole('main');
-    this.manageProductsLink = page
-      .getByRole('banner')
-      .getByRole('link', { name: 'Manage Products' });
+    this.adminSidebar = page.getByRole('navigation', { name: 'Admin', exact: true });
+    this.adminTable = main.getByRole('table', { name: 'Products in the catalog' });
+    this.manageProductsLink = this.adminSidebar.getByRole('link', { name: 'Manage Products' });
     this.addProductLink = main.getByRole('link', { name: 'Add Product' });
 
     this.titleInput = main.getByLabel('Title');
@@ -138,11 +142,18 @@ export class ProductsPage {
     await this.page.waitForURL('**/products/*');
   }
 
-  /** A product card in the admin or customer product list. */
+  /** A product card in the customer list, or the product's row in the admin table. */
   item(productTitle: string): Locator {
-    return this.items.filter({
+    const card = this.items.filter({
       has: this.page.getByRole('heading', { name: productTitle, level: 2, exact: true }),
     });
+    const adminRow = this.page
+      .getByRole('main')
+      .getByRole('row')
+      .filter({
+        has: this.page.getByRole('rowheader', { name: productTitle, exact: true }),
+      });
+    return card.or(adminRow);
   }
 
   itemImage(productTitle: string): Locator {

@@ -7,8 +7,7 @@ test.describe('admin login', () => {
 
     await expect(page).toHaveURL(/\/$/);
     const header = page.getByRole('banner');
-    await expect(header.getByRole('link', { name: 'Manage Products' })).toBeVisible();
-    await expect(header.getByRole('link', { name: 'Manage Orders' })).toBeVisible();
+    await expect(header.getByRole('link', { name: 'Admin' })).toBeVisible();
     await expect(header.getByRole('button', { name: 'Logout' })).toBeVisible();
   });
 

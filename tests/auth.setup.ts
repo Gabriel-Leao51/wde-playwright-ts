@@ -3,7 +3,7 @@ import { roles, users, type Role } from '../test-data';
 
 /** A header control only this role sees once logged in. */
 const roleLandmark: Record<Role, { role: 'link' | 'button'; name: string }> = {
-  admin: { role: 'link', name: 'Manage Products' },
+  admin: { role: 'link', name: 'Admin' },
   customer: { role: 'button', name: 'Account' },
 };
 

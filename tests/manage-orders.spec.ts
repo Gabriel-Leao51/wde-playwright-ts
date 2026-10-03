@@ -5,8 +5,8 @@ test.describe('manage orders (admin)', () => {
   test.use({ loggedInAs: 'admin' });
 
   test('updates an order status and shows a success toast', async ({ page, ordersPage }) => {
-    await page.goto('/');
-    await ordersPage.openFromHeader();
+    await page.goto('/admin/products');
+    await ordersPage.openFromSidebar();
 
     const orderId = orders.orderData.testOrderId;
     await ordersPage.updateStatus(orderId, 'Fulfilled');
@@ -19,8 +19,8 @@ test.describe('manage orders (admin)', () => {
     page,
     ordersPage,
   }) => {
-    await page.goto('/');
-    await ordersPage.openFromHeader();
+    await page.goto('/admin/products');
+    await ordersPage.openFromSidebar();
 
     await ordersPage.columnHeader('Status').click();
     const ascending = await ordersPage.statusValues();

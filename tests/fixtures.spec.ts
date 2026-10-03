@@ -8,9 +8,7 @@ test.describe('saved admin session', () => {
   test('opens the admin panel without logging in', async ({ page }) => {
     await page.goto('/admin/products');
 
-    await expect(
-      page.getByRole('banner').getByRole('link', { name: 'Manage Products' }),
-    ).toBeVisible();
+    await expect(page.getByRole('banner').getByRole('link', { name: 'Admin' })).toBeVisible();
   });
 });
 

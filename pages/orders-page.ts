@@ -10,7 +10,9 @@ export class OrdersPage {
   readonly downloadInvoiceLink: Locator;
 
   constructor(readonly page: Page) {
-    this.manageOrdersLink = page.getByRole('banner').getByRole('link', { name: 'Manage Orders' });
+    this.manageOrdersLink = page
+      .getByRole('navigation', { name: 'Admin', exact: true })
+      .getByRole('link', { name: 'Manage Orders' });
     this.customerOrdersLink = page
       .getByRole('banner')
       .getByRole('link', { name: 'Orders', exact: true });
@@ -22,7 +24,7 @@ export class OrdersPage {
   }
 
   /** Waits for `load`, not just the URL: the Update buttons are wired up by a deferred script. */
-  async openFromHeader(): Promise<void> {
+  async openFromSidebar(): Promise<void> {
     await this.manageOrdersLink.click();
     await this.page.waitForURL('**/admin/orders');
   }

@@ -92,11 +92,10 @@ test.describe('customer logout', () => {
 test.describe('admin header', () => {
   test.use({ loggedInAs: 'admin' });
 
-  test('has the management links and Logout but no search or cart', async ({ page, header }) => {
+  test('has the Admin link and Logout but no search or cart', async ({ page, header }) => {
     await page.goto('/admin/products');
 
-    await expect(header.root.getByRole('link', { name: 'Manage Products' })).toBeVisible();
-    await expect(header.root.getByRole('link', { name: 'Manage Orders' })).toBeVisible();
+    await expect(header.root.getByRole('link', { name: 'Admin' })).toBeVisible();
     await expect(header.logoutButton).toBeVisible();
     await expect(header.search).toBeHidden();
     await expect(header.cartLink).toBeHidden();

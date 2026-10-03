@@ -21,6 +21,14 @@ async function pinOrderCardVolatileText(card: Locator): Promise<void> {
     el.setAttribute('class', 'badge badge-pending');
   });
 }
+/**
+ * The admin table gains and loses rows as product-crud runs in parallel, which would shift the
+ * row's y offset by a subpixel, so the shot is taken with the row alone in the table body.
+ */
+async function isolateAdminRow(row: Locator): Promise<void> {
+  await row.evaluate((el) => el.parentElement?.replaceChildren(el));
+}
+
 /** Logs in fresh (a cart mutates the shared session) and puts the seed chair in the cart. */
 async function openCartWithChair(
   page: Page,
@@ -124,6 +132,24 @@ test.describe('Visual regression', () => {
     await expect(page).toHaveScreenshot('product-details.png', { fullPage: true });
   });
 
+  test.describe('admin sidebar and product row', () => {
+    test.use({ loggedInAs: 'admin' });
+
+    test('admin sidebar', async ({ page, productsPage }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await productsPage.visitAdminList();
+      await expect(productsPage.adminSidebar).toHaveScreenshot('admin-sidebar.png');
+    });
+
+    test('admin product row', async ({ page, productsPage }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await productsPage.visitAdminList();
+      const row = productsPage.item('Red and Black Gaming Chair');
+      await isolateAdminRow(row);
+      await expect(row).toHaveScreenshot('admin-product-row.png');
+    });
+  });
+
   test.describe('customer order card', () => {
     test.use({ loggedInAs: 'customer' });
 
@@ -180,6 +206,24 @@ test.describe('Visual regression, dark theme', () => {
   test('login page, dark', async ({ page, loginPage }) => {
     await loginPage.visit();
     await expect(page).toHaveScreenshot('login-dark.png', { fullPage: true });
+  });
+
+  test.describe('admin sidebar and product row', () => {
+    test.use({ loggedInAs: 'admin' });
+
+    test('admin sidebar, dark', async ({ page, productsPage }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await productsPage.visitAdminList();
+      await expect(productsPage.adminSidebar).toHaveScreenshot('admin-sidebar-dark.png');
+    });
+
+    test('admin product row, dark', async ({ page, productsPage }) => {
+      await page.setViewportSize({ width: 1280, height: 800 });
+      await productsPage.visitAdminList();
+      const row = productsPage.item('Red and Black Gaming Chair');
+      await isolateAdminRow(row);
+      await expect(row).toHaveScreenshot('admin-product-row-dark.png');
+    });
   });
 
   test.describe('customer order card', () => {
