@@ -34,6 +34,14 @@ export class OrdersPage {
     await this.page.waitForURL('**/orders');
   }
 
+  /** A customer order card, found by its "#REFERENCE" heading (in any language) (the last 6 characters of the id). */
+  orderCard(orderId: string): Locator {
+    const reference = orderId.slice(-6).toUpperCase();
+    return this.page.getByRole('article').filter({
+      has: this.page.getByRole('heading', { name: new RegExp(`#${reference}$`) }),
+    });
+  }
+
   row(orderId: string): Locator {
     return this.page.getByRole('row').filter({
       // The order id only exists in the row's hidden form input; nothing visible identifies an order.

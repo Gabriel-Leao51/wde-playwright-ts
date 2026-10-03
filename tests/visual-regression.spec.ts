@@ -1,6 +1,17 @@
-import type { Page } from '@playwright/test';
+import type { Locator, Page } from '@playwright/test';
 import { test, expect } from '../fixtures';
-import { users } from '../test-data';
+import { orders, users } from '../test-data';
+
+/**
+ * The seed order's date changes on every reseed and manage-orders edits its status, so both are
+ * masked in the order card shots; the rest of the card is fixed.
+ */
+function orderCardMasks(card: Locator): Locator[] {
+  return [
+    card.getByText(/^[A-Z][a-z]{2}, [A-Z][a-z]+ \d{1,2}, \d{4}$/),
+    card.getByText(/^(PENDING|FULFILLED|CANCELLED)$/),
+  ];
+}
 
 /** Logs in fresh (a cart mutates the shared session) and puts the seed chair in the cart. */
 async function openCartWithChair(
@@ -104,6 +115,16 @@ test.describe('Visual regression', () => {
     await page.goto('/products/000000000000000000000001');
     await expect(page).toHaveScreenshot('product-details.png', { fullPage: true });
   });
+
+  test.describe('customer order card', () => {
+    test.use({ loggedInAs: 'customer' });
+
+    test('order card', async ({ page, ordersPage }) => {
+      await page.goto('/orders');
+      const card = ordersPage.orderCard(orders.orderData.testOrderId);
+      await expect(card).toHaveScreenshot('order-card.png', { mask: orderCardMasks(card) });
+    });
+  });
 });
 
 // Dark baselines cover one page per template (see ROADMAP.md, Dark mode); the header is shared.
@@ -150,5 +171,15 @@ test.describe('Visual regression, dark theme', () => {
   test('login page, dark', async ({ page, loginPage }) => {
     await loginPage.visit();
     await expect(page).toHaveScreenshot('login-dark.png', { fullPage: true });
+  });
+
+  test.describe('customer order card', () => {
+    test.use({ loggedInAs: 'customer' });
+
+    test('order card, dark', async ({ page, ordersPage }) => {
+      await page.goto('/orders');
+      const card = ordersPage.orderCard(orders.orderData.testOrderId);
+      await expect(card).toHaveScreenshot('order-card-dark.png', { mask: orderCardMasks(card) });
+    });
   });
 });
