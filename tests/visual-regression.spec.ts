@@ -3,16 +3,18 @@ import { test, expect } from '../fixtures';
 import { orders, users } from '../test-data';
 
 /**
- * The seed order's date changes on every reseed and manage-orders edits its status, so both are
- * masked in the order card shots; the rest of the card is fixed.
+ * The seed order's date changes on every reseed and manage-orders edits its status, and a mask
+ * would change size with the text, so both are overwritten with fixed values before the shot.
  */
-function orderCardMasks(card: Locator): Locator[] {
-  return [
-    card.getByText(/^[A-Z][a-z]{2}, [A-Z][a-z]+ \d{1,2}, \d{4}$/),
-    card.getByText(/^(PENDING|FULFILLED|CANCELLED)$/),
-  ];
+async function pinOrderCardVolatileText(card: Locator): Promise<void> {
+  await card
+    .getByText(/^[A-Z][a-z]{2}, [A-Z][a-z]+ \d{1,2}, \d{4}$/)
+    .evaluate((el) => (el.textContent = 'Mon, January 5, 2026'));
+  await card.getByText(/^(PENDING|FULFILLED|CANCELLED)$/).evaluate((el) => {
+    el.textContent = 'PENDING';
+    el.setAttribute('class', 'badge badge-pending');
+  });
 }
-
 /** Logs in fresh (a cart mutates the shared session) and puts the seed chair in the cart. */
 async function openCartWithChair(
   page: Page,
@@ -122,7 +124,8 @@ test.describe('Visual regression', () => {
     test('order card', async ({ page, ordersPage }) => {
       await page.goto('/orders');
       const card = ordersPage.orderCard(orders.orderData.testOrderId);
-      await expect(card).toHaveScreenshot('order-card.png', { mask: orderCardMasks(card) });
+      await pinOrderCardVolatileText(card);
+      await expect(card).toHaveScreenshot('order-card.png');
     });
   });
 });
@@ -179,7 +182,8 @@ test.describe('Visual regression, dark theme', () => {
     test('order card, dark', async ({ page, ordersPage }) => {
       await page.goto('/orders');
       const card = ordersPage.orderCard(orders.orderData.testOrderId);
-      await expect(card).toHaveScreenshot('order-card-dark.png', { mask: orderCardMasks(card) });
+      await pinOrderCardVolatileText(card);
+      await expect(card).toHaveScreenshot('order-card-dark.png');
     });
   });
 });
