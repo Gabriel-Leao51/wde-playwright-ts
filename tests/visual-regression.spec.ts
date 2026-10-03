@@ -7,6 +7,12 @@ import { orders, users } from '../test-data';
  * would change size with the text, so both are overwritten with fixed values before the shot.
  */
 async function pinOrderCardVolatileText(card: Locator): Promise<void> {
+  // Other specs add orders above the seed one, and the card's fractional y offset then shifts
+  // its text by a subpixel between runs, so the shot is taken with the card alone in the list.
+  await card.evaluate((el) => {
+    const item = el.parentElement;
+    item?.parentElement?.replaceChildren(item);
+  });
   await card
     .getByText(/^[A-Z][a-z]{2}, [A-Z][a-z]+ \d{1,2}, \d{4}$/)
     .evaluate((el) => (el.textContent = 'Mon, January 5, 2026'));
