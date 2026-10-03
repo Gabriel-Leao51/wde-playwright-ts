@@ -44,6 +44,18 @@ test.describe('Visual regression', () => {
     await expect(page).toHaveScreenshot('otp-request.png', { fullPage: true });
   });
 
+  test('OTP verify page', async ({ page }) => {
+    await page.goto('/login/otp/verify?email=nobody@example.com');
+    await expect(page).toHaveScreenshot('otp-verify.png', { fullPage: true });
+  });
+
+  test('login page with validation errors', async ({ page, loginPage }) => {
+    await loginPage.visit();
+    await loginPage.loginButton.click();
+    await expect(loginPage.emailInput).toHaveAttribute('aria-invalid', 'true');
+    await expect(page).toHaveScreenshot('login-errors.png', { fullPage: true });
+  });
+
   test('401 Unauthorized page', async ({ page }) => {
     await page.goto('/401');
     await expect(page).toHaveScreenshot('401.png', { fullPage: true });
@@ -101,6 +113,11 @@ test.describe('Visual regression, dark theme', () => {
   test('home page, dark', async ({ page, homePage }) => {
     await homePage.visit();
     await expect(page).toHaveScreenshot('home-dark.png', { fullPage: true });
+  });
+
+  test('signup page, dark', async ({ page }) => {
+    await page.goto('/signup');
+    await expect(page).toHaveScreenshot('signup-dark.png', { fullPage: true });
   });
 
   test('product card, dark', async ({ productsPage }) => {
