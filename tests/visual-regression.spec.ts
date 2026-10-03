@@ -29,6 +29,22 @@ async function isolateAdminRow(row: Locator): Promise<void> {
   await row.evaluate((el) => el.parentElement?.replaceChildren(el));
 }
 
+/**
+ * The seed order's row, alone in the table body (other specs add orders and change statuses), with
+ * its date and status badge overwritten with fixed values like the customer card.
+ */
+async function isolateAdminOrderRow(row: Locator): Promise<void> {
+  await row.evaluate((el) => el.parentElement?.replaceChildren(el));
+  await row
+    .getByRole('cell')
+    .first()
+    .evaluate((el) => (el.textContent = 'Mon, January 5, 2026'));
+  await row.getByText(/^(PENDING|FULFILLED|CANCELLED)$/).evaluate((el) => {
+    el.textContent = 'PENDING';
+    el.setAttribute('class', 'badge badge-pending');
+  });
+}
+
 /** Logs in fresh (a cart mutates the shared session) and puts the seed chair in the cart. */
 async function openCartWithChair(
   page: Page,
@@ -150,6 +166,17 @@ test.describe('Visual regression', () => {
     });
   });
 
+  test.describe('admin order row', () => {
+    test.use({ loggedInAs: 'admin' });
+
+    test('admin order row', async ({ ordersPage }) => {
+      await ordersPage.visit();
+      const row = ordersPage.row(orders.orderData.testOrderId);
+      await isolateAdminOrderRow(row);
+      await expect(row).toHaveScreenshot('admin-order-row.png');
+    });
+  });
+
   test.describe('customer order card', () => {
     test.use({ loggedInAs: 'customer' });
 
@@ -223,6 +250,17 @@ test.describe('Visual regression, dark theme', () => {
       const row = productsPage.item('Red and Black Gaming Chair');
       await isolateAdminRow(row);
       await expect(row).toHaveScreenshot('admin-product-row-dark.png');
+    });
+  });
+
+  test.describe('admin order row', () => {
+    test.use({ loggedInAs: 'admin' });
+
+    test('admin order row, dark', async ({ ordersPage }) => {
+      await ordersPage.visit();
+      const row = ordersPage.row(orders.orderData.testOrderId);
+      await isolateAdminOrderRow(row);
+      await expect(row).toHaveScreenshot('admin-order-row-dark.png');
     });
   });
 

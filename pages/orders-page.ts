@@ -44,13 +44,17 @@ export class OrdersPage {
     });
   }
 
+  /** An admin table row, found by its "#REFERENCE" row header (the last 6 characters of the id). */
   row(orderId: string): Locator {
+    const reference = orderId.slice(-6).toUpperCase();
     return this.page.getByRole('row').filter({
-      // The order id only exists in the row's hidden form input; nothing visible identifies an order.
-      has: this.page.locator(`input[name="orderid"][value="${orderId}"]`),
+      has: this.page.getByRole('rowheader', { name: `#${reference}`, exact: true }),
     });
   }
 
+  get adminTable(): Locator {
+    return this.page.getByRole('table').filter({ has: this.page.getByRole('rowheader') });
+  }
   /** The row's status badge showing `status`; `toBeVisible()` on it asserts the status. */
   statusCell(orderId: string, status: OrderStatus): Locator {
     return this.row(orderId).getByRole('cell', { name: status.toUpperCase(), exact: true });
