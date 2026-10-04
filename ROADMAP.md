@@ -83,7 +83,7 @@ Later skills, written from real experience rather than upfront:
 - [x] **27.** Error pages, toast and modal polish
 - [x] **28.** Responsive pass, plus mobile device projects in Playwright (Pixel, iPhone)
 - [x] **29.** Accessibility scans with `@axe-core/playwright`
-- [ ] **30.** Wrap-up: READMEs with screenshots, CI badges, a short "what I built and why" write-up
+- [x] **30.** Wrap-up: READMEs with screenshots, CI badges, a short "what I built and why" write-up
 
 ## Progress log
 
@@ -138,3 +138,4 @@ Later skills, written from real experience rather than upfront:
 - 2026-10-04, Admin flow follow-up CI: green on chromium, firefox, webkit, mobile-chrome and mobile-safari (run 37236375614, after a rerun). The first attempt failed on chromium and webkit only because I pushed this repo before `wde` `master`, so those jobs checked out the old app (no admin search box); the rule stands: `wde` first, then this repo.
 - 2026-10-04, Delete dialog fix (before session 30): the delete confirmation appeared at the bottom of the screen. Cause: a regression from the spacing polish, where `main > :last-child { margin-bottom: 0 }` also hit the modal `<dialog>` (the last child of `main`) and removed the auto margin the browser uses to centre it; it now skips dialogs and the dialog sets `margin: auto` itself. New test in `error-toast-modal.spec.ts` checks the dialog's centre against the viewport's on a desktop and a phone size (it failed by 296px on the old CSS). The three delete-dialog baselines had captured the bug and were regenerated. Lesson: the earlier baseline regeneration in the admin flow follow-up baked the bottom-pinned dialog in, so a baseline update is not a review; look at the screenshot.
 - 2026-10-04, Delete dialog fix CI: green on chromium, firefox, webkit, mobile-chrome and mobile-safari (run 37239703068).
+- 2026-10-04, Session 30: done. Wrap-up of the whole roadmap. New README.md here (CI badge, what is covered per area, how the suite is built, run and CI instructions, screenshot gallery) and docs/what-i-built.md (the short write-up: why, the two halves, what the suite caught, what is next). docs/capture-screenshots.mjs regenerates the 10 screenshots from the running stack (documentation images, not baselines; I looked at each one before committing). wde's README now shows the redesigned app (the old pre-redesign screenshots are replaced), lists the new features and points its testing section at this repo, with the Python suite described as frozen. eslint.config.mjs gets a small override so the standalone script lints. Left for the user: flip the GitHub rchived setting on wde-test-automation (gh repo archive, blocked in session 13). Still open from session 22: the two WebKit cart-with-item baselines stay skipped.

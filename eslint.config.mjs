@@ -21,6 +21,13 @@ export default defineConfig(
     files: ['**/*.mjs'],
     extends: [tseslint.configs.disableTypeChecked],
   },
+  {
+    // Standalone Node script (not a test); `document` is the page's, used inside page.evaluate.
+    files: ['docs/*.mjs'],
+    languageOptions: {
+      globals: { process: 'readonly', console: 'readonly', document: 'readonly' },
+    },
+  },
   { plugins: playwrightRecommended.plugins },
   {
     files: ['tests/**/*.ts'],
