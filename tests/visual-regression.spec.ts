@@ -104,6 +104,11 @@ test.describe('Visual regression', () => {
     await expect(page).toHaveScreenshot('401.png', { fullPage: true });
   });
 
+  test('404 Not Found page', async ({ page }) => {
+    await page.goto('/products/000000000000000000000099');
+    await expect(page).toHaveScreenshot('404.png', { fullPage: true });
+  });
+
   test('403 Forbidden page', async ({ page }) => {
     await page.goto('/403');
     await expect(page).toHaveScreenshot('403.png', { fullPage: true });
@@ -193,6 +198,11 @@ test.describe('Visual regression', () => {
 test.describe('Visual regression, dark theme', () => {
   test.use({ colorScheme: 'dark' });
 
+  test('404 page, dark', async ({ page }) => {
+    await page.goto('/products/000000000000000000000099');
+    await expect(page).toHaveScreenshot('404-dark.png', { fullPage: true });
+  });
+
   test('home page, dark', async ({ page, homePage }) => {
     await homePage.visit();
     await expect(page).toHaveScreenshot('home-dark.png', { fullPage: true });
@@ -273,5 +283,15 @@ test.describe('Visual regression, dark theme', () => {
       await pinOrderCardVolatileText(card);
       await expect(card).toHaveScreenshot('order-card-dark.png');
     });
+  });
+});
+
+test.describe('Visual regression, delete confirmation dialog', () => {
+  test.use({ loggedInAs: 'admin' });
+
+  test('delete dialog', async ({ productsPage }) => {
+    await productsPage.visitAdminList();
+    await productsPage.deleteButton('Red and Black Gaming Chair').click();
+    await expect(productsPage.deleteDialog).toHaveScreenshot('delete-dialog.png');
   });
 });
