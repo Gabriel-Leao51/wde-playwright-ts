@@ -44,7 +44,7 @@ test.describe('guest header', () => {
 
     const suggestion = page.getByRole('option', { name: /Red and Black Gaming Chair/ });
     await expect(suggestion).toBeVisible();
-    await suggestion.getByRole('link').click();
+    await suggestion.click();
 
     await expect(page).toHaveURL(new RegExp(`${PRODUCT_PAGE}$`));
   });

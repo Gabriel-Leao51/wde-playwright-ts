@@ -86,9 +86,7 @@ export class ProductsPage {
     this.priceInput = main.getByLabel('Price');
     this.departmentSelect = main.getByLabel('Department');
     this.launchDateInput = main.getByLabel('Launch Date');
-    // Quill's contenteditable has no role or label (its <label> points at the wrapper div).
-    // eslint-disable-next-line playwright/no-raw-locators
-    this.descriptionEditor = main.locator('.ql-editor');
+    this.descriptionEditor = main.getByRole('textbox', { name: 'Description' });
     this.saveButton = main.getByRole('button', { name: 'Save' });
     // The form has no accessible role (forms only get one when given an accessible name).
     // eslint-disable-next-line playwright/no-raw-locators
@@ -185,9 +183,7 @@ export class ProductsPage {
   async setDescriptionBold(text: string): Promise<void> {
     await this.descriptionEditor.fill(text);
     await this.descriptionEditor.press('ControlOrMeta+A');
-    // Quill's toolbar buttons are icon-only, with no accessible name.
-    // eslint-disable-next-line playwright/no-raw-locators
-    await this.page.locator('.ql-toolbar button.ql-bold').click();
+    await this.page.getByRole('button', { name: 'Bold' }).click();
   }
 
   /**
