@@ -31,7 +31,7 @@ async function isolateAdminRow(row: Locator): Promise<void> {
 
 /**
  * The seed order's row, alone in the table body (other specs add orders and change statuses), with
- * its date and status badge overwritten with fixed values like the customer card.
+ * its date, status badge and status select set to fixed values like the customer card.
  */
 async function isolateAdminOrderRow(row: Locator): Promise<void> {
   await row.evaluate((el) => el.parentElement?.replaceChildren(el));
@@ -43,6 +43,8 @@ async function isolateAdminOrderRow(row: Locator): Promise<void> {
     el.textContent = 'PENDING';
     el.setAttribute('class', 'badge badge-pending');
   });
+  // The status select shows the stored status too, which depends on whether manage-orders ran.
+  await row.getByRole('combobox').selectOption({ label: 'Pending' });
 }
 
 /** Logs in fresh (a cart mutates the shared session) and puts the seed chair in the cart. */

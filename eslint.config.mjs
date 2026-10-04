@@ -41,6 +41,8 @@ export default defineConfig(
       'playwright/no-eval': 'error',
       'playwright/no-force-option': 'error',
       'playwright/prefer-web-first-assertions': 'error',
+      // Spec-local helpers named expectSomething (e.g. expectTouchTargets) assert too.
+      'playwright/expect-expect': ['warn', { assertFunctionPatterns: ['^expect[A-Z]'] }],
     },
   },
   prettier,

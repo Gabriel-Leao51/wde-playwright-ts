@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        project: [chromium, firefox, webkit]
+        project: [chromium, firefox, webkit, mobile-chrome, mobile-safari]
     steps:
       - name: Checkout test suite
         uses: actions/checkout@v4
