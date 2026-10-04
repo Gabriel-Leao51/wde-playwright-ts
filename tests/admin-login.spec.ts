@@ -5,7 +5,9 @@ test.describe('admin login', () => {
   test('successful admin login', async ({ page, loginPage }) => {
     await loginPage.login(users.admin.email, users.admin.password);
 
-    await expect(page).toHaveURL(/\/$/);
+    // An admin goes straight to the dashboard instead of the store's home page.
+    await expect(page).toHaveURL(/\/admin\/products$/);
+    await expect(page.getByRole('heading', { name: 'Product Administration' })).toBeVisible();
     const header = page.getByRole('banner');
     await expect(header.getByRole('link', { name: 'Admin' })).toBeVisible();
     await expect(header.getByRole('button', { name: 'Logout' })).toBeVisible();

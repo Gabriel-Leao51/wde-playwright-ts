@@ -30,6 +30,14 @@ export class ProductsPage {
   readonly adminSidebar: Locator;
   /** The admin product table; its rows are found by title via item(). */
   readonly adminTable: Locator;
+  /** Admin-only search, inside the Product Administration page (not the store header's search). */
+  readonly adminSearchInput: Locator;
+  readonly adminSearchButton: Locator;
+  readonly adminClearSearchLink: Locator;
+  /** The N products / N of M products line under the page heading. */
+  readonly adminCount: Locator;
+  /** The sidebar link that opens the customer-facing store as a preview. */
+  readonly viewStoreLink: Locator;
 
   // Add/edit form
   readonly titleInput: Locator;
@@ -77,6 +85,11 @@ export class ProductsPage {
     this.adminTable = main.getByRole('table', { name: 'Products in the catalog' });
     this.manageProductsLink = this.adminSidebar.getByRole('link', { name: 'Manage Products' });
     this.addProductLink = main.getByRole('link', { name: 'Add Product' });
+    this.adminSearchInput = main.getByRole('searchbox', { name: 'Search products' });
+    this.adminSearchButton = main.getByRole('button', { name: 'Search', exact: true });
+    this.adminClearSearchLink = main.getByRole('link', { name: 'Clear search' });
+    this.adminCount = main.getByText(/^\s*(\d+ of )?\d+ products?\s*$/);
+    this.viewStoreLink = this.adminSidebar.getByRole('link', { name: 'View store' });
 
     this.titleInput = main.getByLabel('Title');
     this.imageInput = main.getByLabel('Image');
@@ -123,6 +136,13 @@ export class ProductsPage {
   async openAdminListFromHeader(): Promise<void> {
     await this.manageProductsLink.click();
     await this.page.waitForURL('**/admin/products');
+  }
+
+  /** Search the admin product table by name or department and wait for the filtered page. */
+  async searchAdminList(term: string): Promise<void> {
+    await this.adminSearchInput.fill(term);
+    await this.adminSearchButton.click();
+    await this.page.waitForURL('**/admin/products?q=*');
   }
 
   async openAddForm(): Promise<void> {

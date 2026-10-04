@@ -108,6 +108,23 @@ test.describe('interactive states', () => {
     expect(await scan(page)).toEqual([]);
   });
 
+  test.describe('admin product search', () => {
+    test.use({ loggedInAs: 'admin' });
+
+    for (const colorScheme of themes) {
+      test(`results and empty state, ${colorScheme}`, async ({ page, productsPage }) => {
+        await page.emulateMedia({ colorScheme });
+        await page.goto('/admin/products?q=gaming');
+        await expect(productsPage.adminSearchInput).toHaveValue('gaming');
+        expect(await scan(page)).toEqual([]);
+
+        await page.goto('/admin/products?q=zzzz');
+        await expect(page.getByRole('heading', { name: /No products match/ })).toBeVisible();
+        expect(await scan(page)).toEqual([]);
+      });
+    }
+  });
+
   test.describe('rich text editor', () => {
     test('has a named text area and named toolbar buttons, in English and Portuguese', async ({
       page,
