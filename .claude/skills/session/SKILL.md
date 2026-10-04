@@ -23,6 +23,15 @@ This project moves in small, daily, roadmap-driven sessions (see [`CLAUDE.md`](.
    - Tick the checklist box in `ROADMAP.md`.
    - Add one line to the Progress log: date, session number, outcome.
    - Push and verify CI using the `ci-check` skill — never the Actions web page.
+7. **Prune Docker leftovers** — last step, whether or not the session landed green:
+
+   ```bash
+   docker image prune -f
+   docker volume prune -f
+   docker builder prune -f --max-used-space 1gb
+   ```
+
+   This drops dangling images left by `docker compose up --build`, anonymous volumes left by recreated containers, and build cache beyond 1 GB. It never touches tagged images (the Playwright image stays), the named `wde_mongo-data` volume, or anything a running container uses. Docker's disk file never shrinks on its own — it only grows to its high-water mark (capped at 32 GB) — so pruning every session is what keeps that mark low.
 
 ## Notes
 
