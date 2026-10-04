@@ -120,6 +120,35 @@ test.describe('delete confirmation modal', () => {
     await expect(productsPage.item(productTitle)).toBeVisible();
   });
 
+  for (const [name, viewport] of [
+    ['a desktop window', { width: 1280, height: 800 }],
+    ['a phone', { width: 375, height: 700 }],
+  ] as const) {
+    test(`opens in the middle of ${name}, not pinned to an edge`, async ({
+      page,
+      productsPage,
+    }) => {
+      await page.setViewportSize(viewport);
+      await productsPage.visitAdminList();
+      await productsPage.deleteButton(productTitle).click();
+
+      const dialog = productsPage.deleteDialog;
+      await expect(dialog).toBeVisible();
+      // The dialog fades and slides in; measure it once it has settled.
+      await expect.poll(() => dialog.evaluate((el) => el.getAnimations().length)).toBe(0);
+
+      const box = await dialog.boundingBox();
+      expect(box).not.toBeNull();
+      const { x = 0, y = 0, width = 0, height = 0 } = box ?? {};
+      expect(Math.abs(x + width / 2 - viewport.width / 2), 'horizontal centre').toBeLessThanOrEqual(
+        1,
+      );
+      expect(Math.abs(y + height / 2 - viewport.height / 2), 'vertical centre').toBeLessThanOrEqual(
+        1,
+      );
+    });
+  }
+
   test('stays inside a phone viewport', async ({ page, productsPage }) => {
     await page.setViewportSize({ width: 375, height: 700 });
     await productsPage.visitAdminList();
