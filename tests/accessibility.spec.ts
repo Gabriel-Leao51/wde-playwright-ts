@@ -146,6 +146,10 @@ test.describe('interactive states', () => {
         await productsPage.visitAdminList();
         await productsPage.deleteButton(productTitle).click();
         await expect(productsPage.deleteDialog).toBeVisible();
+        // The dialog fades in; axe would measure contrast against half-transparent colours.
+        await expect
+          .poll(() => productsPage.deleteDialog.evaluate((el) => el.getAnimations().length))
+          .toBe(0);
         expect(await scan(page)).toEqual([]);
       });
     }
