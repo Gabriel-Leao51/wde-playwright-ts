@@ -28,9 +28,10 @@ export class StripeCheckoutPage {
     this.cardholderNameInput = page.getByRole('textbox', { name: 'Cardholder name' });
     this.countrySelect = page.getByRole('combobox', { name: 'Country or region' });
     this.zipInput = page.getByRole('textbox', { name: 'ZIP' });
-    this.saveInfoCheckbox = page.getByRole('checkbox', {
-      name: 'Save my information for faster checkout',
-    });
+    // Stripe words this two ways depending on the session: "Save my information for faster
+    // checkout" and "Save my information with Link for faster checkout" (checked by default, and
+    // it then requires a phone number).
+    this.saveInfoCheckbox = page.getByRole('checkbox', { name: /^Save my information/ });
     this.payButton = page.getByRole('button', { name: 'Pay', exact: true });
   }
 
@@ -47,7 +48,13 @@ export class StripeCheckoutPage {
     // an automated test can never provide).
     await this.countrySelect.selectOption({ label: 'United States' });
     await this.zipInput.fill('94103');
-    if (await this.saveInfoCheckbox.isChecked()) await this.saveInfoCheckbox.uncheck();
+    // Not every session offers it, so uncheck it when it appears and carry on when it does not.
+    const offersSaveInfo = await this.saveInfoCheckbox
+      .waitFor({ state: 'visible', timeout: 3_000 })
+      .then(() => true, () => false);
+    if (offersSaveInfo && (await this.saveInfoCheckbox.isChecked())) {
+      await this.saveInfoCheckbox.uncheck();
+    }
 
     await this.payButton.click();
   }
